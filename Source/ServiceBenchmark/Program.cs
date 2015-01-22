@@ -23,6 +23,7 @@ namespace ServiceBenchmark
 
             Run();
 
+
             Console.ReadKey();
         }
 
@@ -30,6 +31,7 @@ namespace ServiceBenchmark
         {
             await TestServiceStack();
             await TestWebApi();
+
             Console.WriteLine("Press any key to exit . . .");
         }
 
@@ -56,7 +58,9 @@ namespace ServiceBenchmark
                 var tasks = new List<Task>();
                 for (int i = 0; i < _numberOfRequestsToSend; i++)
                 {
-                    var t = new WebClient().DownloadStringTaskAsync("http://localhost:16227/item/" + Guid.NewGuid());
+                    var c = new WebClient();
+                    c.Headers["Content-Type"] = "application/json";
+                    var t = c.DownloadStringTaskAsync("http://localhost:16227/item/" + Guid.NewGuid() + "?format=json");// format=json is to make service stack understand request 
                     tasks.Add(t);
                 }
                 await Task.WhenAll(tasks.ToArray());
@@ -76,7 +80,9 @@ namespace ServiceBenchmark
                 var tasks = new List<Task>();
                 for (int i = 0; i < _numberOfRequestsToSend; i++)
                 {
-                    var t = new WebClient().DownloadStringTaskAsync("http://localhost:14851/api/item/" + Guid.NewGuid());
+                    var c = new WebClient();
+                    c.Headers["Content-Type"] = "application/json";
+                    var t = c.DownloadStringTaskAsync("http://localhost:14851/api/item/" + Guid.NewGuid());
                     tasks.Add(t);
                 }
                 await Task.WhenAll(tasks.ToArray());
