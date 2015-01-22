@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -20,83 +21,65 @@ namespace ServiceBenchmark
             Console.WriteLine("Press any key to start . . .");
             Console.ReadKey();
 
-            TestServiceStack();
-            TestWebApi();
+            Run();
 
-            Console.WriteLine();
-            Console.WriteLine("Press any key to exit . . .");
             Console.ReadKey();
         }
 
-        private static void ExecuteAction(string description, Action actionToExecute)
+        private static async void Run()
         {
-            var sw = new Stopwatch();
-            Console.Write(description.PadRight(45));
-            sw.Start();
-            actionToExecute();
-            sw.Stop();
-            Console.WriteLine(string.Format("{0} ms", sw.ElapsedMilliseconds).PadLeft(15));
+            await TestServiceStack();
+            await TestWebApi();
+            Console.WriteLine("Press any key to exit . . .");
         }
 
-        private static void TestServiceStack()
+        private static async Task ExecuteAction(string description, Func<Task> actionToExecute)
+        {
+            var sw = new Stopwatch();
+            Console.Write(description + " . . . ");
+            sw.Start();
+            await actionToExecute();
+            sw.Stop();
+            Console.WriteLine(string.Format("{0} ms", sw.ElapsedMilliseconds));
+        }
+
+        private static async Task TestServiceStack()
         {
             Console.WriteLine();
             Console.WriteLine("------------------------------------------------------------");
             Console.WriteLine("ServiceStack");
             Console.WriteLine("------------------------------------------------------------");
 
-            var client = new JsonServiceClient();
-            client.BaseUri = new Uri("http://localhost:16227/").AbsoluteUri;
 
-            ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to item/id", () =>
+            await ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to item/id", async () =>
             {
+                var tasks = new List<Task>();
                 for (int i = 0; i < _numberOfRequestsToSend; i++)
                 {
-                    var response = client.Get<ItemResponse>("item/" + Guid.NewGuid());
-                    if (response.Item == null)
-                        throw new Exception("Item not received.");
-                    //Console.WriteLine("ItemID\t\t{0}\nDescription\t{1}\nModifiedAt\t{2}", response.Item.ItemID, response.Item.Description, response.Item.ModifiedAt);
+                    var t = new WebClient().DownloadStringTaskAsync("http://localhost:16227/item/" + Guid.NewGuid());
+                    tasks.Add(t);
                 }
+                await Task.WhenAll(tasks.ToArray());
             });
         }
 
-        private static void TestWebApi()
+        private static async Task TestWebApi()
         {
             Console.WriteLine();
             Console.WriteLine("------------------------------------------------------------");
             Console.WriteLine("Web API");
             Console.WriteLine("------------------------------------------------------------");
 
-            var client = new JsonServiceClient();
-            client.BaseUri = new Uri("http://localhost:14851/").AbsoluteUri;
 
-//            var client = new HttpClient();
-//            client.BaseAddress = new Uri("http://localhost:14851/");
-//
-//            client.DefaultRequestHeaders.Accept.Add(
-//                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to api/item/id", () =>
+            await ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to api/item/id", async () =>
             {
+                var tasks = new List<Task>();
                 for (int i = 0; i < _numberOfRequestsToSend; i++)
                 {
-                    var item = client.Get<Item>("api/item/" + Guid.NewGuid());
-                    if (item == null)
-                        throw new Exception("Item not received.");
-
-//                    var response = client.GetAsync("api/item/" + Guid.NewGuid().ToString()).Result;
-//                    if (response.IsSuccessStatusCode)
-//                    {
-//                        var item = response.Content.ReadAsAsync<Item>().Result;
-//                        if (item == null)
-//                            throw new Exception("Item not received.");
-//                        //Console.WriteLine("ItemID\t\t{0}\nDescription\t{1}\nModifiedAt\t{2}", item.ItemID, item.Description, item.ModifiedAt);
-//                    }
-//                    else
-//                    {
-//                        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
-//                    }
+                    var t = new WebClient().DownloadStringTaskAsync("http://localhost:14851/api/item/" + Guid.NewGuid());
+                    tasks.Add(t);
                 }
+                await Task.WhenAll(tasks.ToArray());
             });
         }
     }
