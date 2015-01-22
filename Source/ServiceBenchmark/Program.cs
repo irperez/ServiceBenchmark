@@ -67,28 +67,35 @@ namespace ServiceBenchmark
             Console.WriteLine("Web API");
             Console.WriteLine("------------------------------------------------------------");
 
-            var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:14851/");
+            var client = new JsonServiceClient();
+            client.BaseUri = new Uri("http://localhost:14851/").AbsoluteUri;
 
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+//            var client = new HttpClient();
+//            client.BaseAddress = new Uri("http://localhost:14851/");
+//
+//            client.DefaultRequestHeaders.Accept.Add(
+//                new MediaTypeWithQualityHeaderValue("application/json"));
 
             ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to api/item/id", () =>
             {
                 for (int i = 0; i < _numberOfRequestsToSend; i++)
                 {
-                    var response = client.GetAsync("api/item/" + Guid.NewGuid().ToString()).Result;
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var item = response.Content.ReadAsAsync<Item>().Result;
-                        if (item == null)
-                            throw new Exception("Item not received.");
-                        //Console.WriteLine("ItemID\t\t{0}\nDescription\t{1}\nModifiedAt\t{2}", item.ItemID, item.Description, item.ModifiedAt);
-                    }
-                    else
-                    {
-                        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
-                    }
+                    var item = client.Get<Item>("api/item/" + Guid.NewGuid());
+                    if (item == null)
+                        throw new Exception("Item not received.");
+
+//                    var response = client.GetAsync("api/item/" + Guid.NewGuid().ToString()).Result;
+//                    if (response.IsSuccessStatusCode)
+//                    {
+//                        var item = response.Content.ReadAsAsync<Item>().Result;
+//                        if (item == null)
+//                            throw new Exception("Item not received.");
+//                        //Console.WriteLine("ItemID\t\t{0}\nDescription\t{1}\nModifiedAt\t{2}", item.ItemID, item.Description, item.ModifiedAt);
+//                    }
+//                    else
+//                    {
+//                        Console.WriteLine("{0} ({1})", (int)response.StatusCode, response.ReasonPhrase);
+//                    }
                 }
             });
         }
