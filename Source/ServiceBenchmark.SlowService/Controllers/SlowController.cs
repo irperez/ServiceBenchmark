@@ -9,7 +9,7 @@ namespace ServiceBenchmark.SlowService.Controllers
         [Route("api/slow")]
         public string Get()
         {
-            Thread.Sleep(200);
+            Thread.Sleep(100);
             return "Some String";
         }
     }

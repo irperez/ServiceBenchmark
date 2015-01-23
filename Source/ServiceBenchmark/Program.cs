@@ -14,7 +14,7 @@ namespace ServiceBenchmark
 {
     class Program
     {
-        private const int NumberOfRequestsPerBatch = 50;
+        private const int NumberOfRequestsPerBatch = 100;
         private const int NumberBatches = 10;
 
         static void Main(string[] args)
