@@ -14,7 +14,8 @@ namespace ServiceBenchmark
 {
     class Program
     {
-        private static readonly int _numberOfRequestsToSend = 10000;
+        private const int NumberOfRequestsPerBatch = 50;
+        private const int NumberBatches = 10;
 
         static void Main(string[] args)
         {
@@ -29,34 +30,48 @@ namespace ServiceBenchmark
 
         private static async void Run()
         {
-            await TestServiceStack();
-            await TestWebApi();
+            Console.WriteLine("Please wait . . .");
 
-            Console.WriteLine("Press any key to exit . . .");
-        }
+            long serviceStack = 0;
+            long webApi = 0;
+            // let's mix up ServiceStack and WebApi to minimize effects of thread availability fluctuation
+            foreach (var i in Enumerable.Range(0, NumberBatches))
+            {
+                serviceStack += await TestServiceStack();
+                webApi += await TestWebApi();
+            }
 
-        private static async Task ExecuteAction(string description, Func<Task> actionToExecute)
-        {
-            var sw = new Stopwatch();
-            Console.Write(description + " . . . ");
-            sw.Start();
-            await actionToExecute();
-            sw.Stop();
-            Console.WriteLine(string.Format("{0} ms", sw.ElapsedMilliseconds));
-        }
-
-        private static async Task TestServiceStack()
-        {
             Console.WriteLine();
             Console.WriteLine("------------------------------------------------------------");
             Console.WriteLine("ServiceStack");
             Console.WriteLine("------------------------------------------------------------");
+            Console.WriteLine(serviceStack + "ms ");
 
+            Console.WriteLine();
+            Console.WriteLine("------------------------------------------------------------");
+            Console.WriteLine("Web API");
+            Console.WriteLine("------------------------------------------------------------");
+            Console.WriteLine(webApi + "ms ");
 
-            await ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to item/id", async () =>
+            Console.WriteLine("Press any key to exit . . .");
+        }
+
+        private static async Task<long> ExecuteAction(Func<Task> actionToExecute)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            await actionToExecute();
+            sw.Stop();
+            
+            return sw.ElapsedMilliseconds;
+        }
+
+        private static async Task<long> TestServiceStack()
+        {
+            var ms = await ExecuteAction(async () =>
             {
                 var tasks = new List<Task>();
-                for (int i = 0; i < _numberOfRequestsToSend; i++)
+                for (int i = 0; i < NumberOfRequestsPerBatch; i++)
                 {
                     var c = new WebClient();
                     c.Headers["Content-Type"] = "application/json";
@@ -65,20 +80,15 @@ namespace ServiceBenchmark
                 }
                 await Task.WhenAll(tasks.ToArray());
             });
+            return ms;
         }
 
-        private static async Task TestWebApi()
+        private static async Task<long> TestWebApi()
         {
-            Console.WriteLine();
-            Console.WriteLine("------------------------------------------------------------");
-            Console.WriteLine("Web API");
-            Console.WriteLine("------------------------------------------------------------");
-
-
-            await ExecuteAction(_numberOfRequestsToSend.ToString() + " requests to api/item/id", async () =>
+            var ms = await ExecuteAction(async () =>
             {
                 var tasks = new List<Task>();
-                for (int i = 0; i < _numberOfRequestsToSend; i++)
+                for (int i = 0; i < NumberOfRequestsPerBatch; i++)
                 {
                     var c = new WebClient();
                     c.Headers["Content-Type"] = "application/json";
@@ -87,6 +97,7 @@ namespace ServiceBenchmark
                 }
                 await Task.WhenAll(tasks.ToArray());
             });
+            return ms;
         }
     }
 }

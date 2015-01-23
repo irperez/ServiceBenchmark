@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceBenchmark.SvcStack",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceBenchmark.Common", "ServiceBenchmark.Common\ServiceBenchmark.Common.csproj", "{42DDD064-8D01-4814-B2CF-8404ED969524}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceBenchmark.SlowService", "ServiceBenchmark.SlowService\ServiceBenchmark.SlowService.csproj", "{CECA97FC-D7BD-4C86-98C6-C09F54D259A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{42DDD064-8D01-4814-B2CF-8404ED969524}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42DDD064-8D01-4814-B2CF-8404ED969524}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42DDD064-8D01-4814-B2CF-8404ED969524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CECA97FC-D7BD-4C86-98C6-C09F54D259A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CECA97FC-D7BD-4C86-98C6-C09F54D259A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CECA97FC-D7BD-4C86-98C6-C09F54D259A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CECA97FC-D7BD-4C86-98C6-C09F54D259A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
