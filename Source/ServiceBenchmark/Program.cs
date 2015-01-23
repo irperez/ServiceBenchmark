@@ -30,7 +30,7 @@ namespace ServiceBenchmark
 
         private static async void Run()
         {
-            Console.WriteLine("Please wait . . .");
+            Console.WriteLine("Please wait . . . the results will show up in about 20-ish seconds");
 
             long serviceStack = 0;
             long webApi = 0;
@@ -75,7 +75,8 @@ namespace ServiceBenchmark
                 {
                     var c = new WebClient();
                     c.Headers["Content-Type"] = "application/json";
-                    var t = c.DownloadStringTaskAsync("http://localhost:16227/item/" + Guid.NewGuid() + "?format=json");// format=json is to make service stack understand request 
+                    var t = c.DownloadStringTaskAsync("http://localhost:16227/item/" + Guid.NewGuid() + "?format=json");
+                        //.ContinueWith(rt => Task.Factory.StartNew(() => Console.WriteLine("SS:"+rt.Result)));
                     tasks.Add(t);
                 }
                 await Task.WhenAll(tasks.ToArray());
@@ -93,6 +94,7 @@ namespace ServiceBenchmark
                     var c = new WebClient();
                     c.Headers["Content-Type"] = "application/json";
                     var t = c.DownloadStringTaskAsync("http://localhost:14851/api/item/" + Guid.NewGuid());
+                        //.ContinueWith(rt => Task.Factory.StartNew(() => Console.WriteLine("WA:"+rt.Result)));
                     tasks.Add(t);
                 }
                 await Task.WhenAll(tasks.ToArray());
