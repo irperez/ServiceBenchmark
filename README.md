@@ -6,6 +6,7 @@ see: http://blog.bodurov.com/Web-Api-with-async-await-vs-ServiceStack/
 Comparing speed of "Service-Frameworks":
 - ServiceStack
 - Web API
+- MVC 6 (.Net Core 1.0 RC1)
 
 <b>master branch</b>: claim that ServiceStack is 3 times faster than web api
 
