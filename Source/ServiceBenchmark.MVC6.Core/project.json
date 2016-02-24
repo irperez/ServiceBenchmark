@@ -1,0 +1,33 @@
+﻿{
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+
+    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
+    "System.Net.Http": "4.0.1-beta-23516"
+  },
+
+  "commands": {
+    "web": "Microsoft.AspNet.Server.Kestrel"
+  },
+
+  "frameworks": {
+    "dnxcore50": {
+      "dependencies": {
+      }
+    }
+  },
+
+  "exclude": [
+    "wwwroot",
+    "node_modules"
+  ],
+  "publishExclude": [
+    "**.user",
+    "**.vspscc"
+  ]
+}

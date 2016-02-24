@@ -34,11 +34,13 @@ namespace ServiceBenchmark
 
             long serviceStack = 0;
             long webApi = 0;
+            long mvc6 = 0;
             // let's mix up ServiceStack and WebApi to minimize effects of thread availability fluctuation
             foreach (var i in Enumerable.Range(0, NumberBatches))
             {
                 serviceStack += await TestServiceStack();
                 webApi += await TestWebApi();
+                mvc6 += await TestMVC6();
             }
 
             Console.WriteLine();
@@ -53,6 +55,12 @@ namespace ServiceBenchmark
             Console.WriteLine("------------------------------------------------------------");
             Console.WriteLine(webApi + "ms ");
 
+            Console.WriteLine();
+            Console.WriteLine("------------------------------------------------------------");
+            Console.WriteLine("MVC6 (.Net Core)");
+            Console.WriteLine("------------------------------------------------------------");
+            Console.WriteLine(mvc6 + "ms ");
+
             Console.WriteLine("Press any key to exit . . .");
         }
 
@@ -62,7 +70,7 @@ namespace ServiceBenchmark
             sw.Start();
             await actionToExecute();
             sw.Stop();
-            
+
             return sw.ElapsedMilliseconds;
         }
 
@@ -101,5 +109,24 @@ namespace ServiceBenchmark
             });
             return ms;
         }
+
+        private static async Task<long> TestMVC6()
+        {
+            var ms = await ExecuteAction(async () =>
+            {
+                var tasks = new List<Task>();
+                for (int i = 0; i < NumberOfRequestsPerBatch; i++)
+                {
+                    var c = new WebClient();
+                    c.Headers["Content-Type"] = "application/json";
+                    var t = c.DownloadStringTaskAsync("http://localhost:47670/api/item/" + Guid.NewGuid());
+                    //.ContinueWith(rt => Task.Factory.StartNew(() => Console.WriteLine("WA:"+rt.Result)));
+                    tasks.Add(t);
+                }
+                await Task.WhenAll(tasks.ToArray());
+            });
+            return ms;
+        }
+
     }
 }
